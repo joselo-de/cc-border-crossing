@@ -1,0 +1,23 @@
+Port Name,State,Port Code,Border,Date,Measure,Value
+Ambrose,North Dakota,3410,US-Canada Border,01/01/1996 12:00:00 AM,Trains,0
+Skagway,Alaska,3103,US-Canada Border,01/01/1996 12:00:00 AM,Buses,3
+Raymond,Montana,3301,US-Canada Border,02/01/1996 12:00:00 AM,Buses,9
+Tecate,California,2505,US-Mexico Border,02/01/1996 12:00:00 AM,Buses,90
+Jackman,Maine,104,US-Canada Border,03/01/1996 12:00:00 AM,Trains,33
+Sumas,Washington,3009,US-Canada Border,03/01/1996 12:00:00 AM,Buses,100
+Dunseith,North Dakota,3422,US-Canada Border,04/01/1996 12:00:00 AM,Buses,22
+Eagle Pass,Texas,2303,US-Mexico Border,04/01/1996 12:00:00 AM,Buses,388
+Lynden,Washington,3023,US-Canada Border,04/01/1996 12:00:00 AM,Buses,42
+Warroad,Minnesota,3423,US-Canada Border,06/01/2019 12:00:00 AM,Buses,3
+Roseau,Minnesota,3426,US-Canada Border,06/01/2019 12:00:00 AM,Buses,4
+Detroit,Michigan,3801,US-Canada Border,06/01/2019 12:00:00 AM,Buses,615
+Sumas,Washington,3009,US-Canada Border,06/01/2019 12:00:00 AM,Trains,10
+Roseau,Minnesota,3426,US-Canada Border,05/01/2019 12:00:00 AM,Buses,2
+Port Huron,Michigan,3802,US-Canada Border,04/01/2019 12:00:00 AM,Buses,194
+Morgan,Montana,3319,US-Canada Border,04/01/2019 12:00:00 AM,Buses,1
+Buffalo-Niagara Falls,New York,901,US-Canada Border,04/01/2019 12:00:00 AM,Buses,1052
+Buffalo-Niagara Falls,New York,901,US-Canada Border,04/01/2019 12:00:00 AM,Trains,187
+Jackman,Maine,104,US-Canada Border,12/01/2018 12:00:00 AM,Trains,18
+Houlton,Maine,106,US-Canada Border,11/01/2018 12:00:00 AM,Buses,53
+Oroville,Washington,3019,US-Canada Border,11/01/2018 12:00:00 AM,Buses,14
+Eagle Pass,Texas,2303,US-Mexico Border,11/01/2018 12:00:00 AM,Trains,287
