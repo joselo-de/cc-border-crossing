@@ -15,5 +15,3 @@ Solution overview: At first, we tried to use a single loop that would iterate on
 The solution provided uses classes as to emulate a database. It enabled access to specific values on every line of the csv file. Combining that approach with other dictionaries we were able to calculate averages and sums in an efficient way.
 
 At the end, the use of itemgetter() provided and easy way to sort our results according to the requirements.
-
-Future improvements: the use of two dictionaries to calculate sums and averages on each border resulted in duplicated code. It would be great to acomplish doing the same with only one dictionary, or otherwise it would be good exploring breaking up the different pieces to make the flow more readable.

@@ -29,7 +29,8 @@ def csv_to_dblist(filename):
      Returns:
      crossing_db. database abstraction containing integers, strings or datetype
      cross_types. list of all available cross types in csv (Passengers, Trains, etc)
-     years_in_file. list of all years encountered in csv
+     years_in_file. list of all years in csv
+     all_borders. list of all borders in file
   """
   with open(filename, 'r') as f:
     # skip first line (header)
@@ -42,6 +43,7 @@ def csv_to_dblist(filename):
     crossing_db = []
     cross_types = []
     years_in_file = []
+    all_borders = []
 
     for line in f_list:
       port_name, state, code, border, date, measure, value, *extras = line
@@ -57,7 +59,11 @@ def csv_to_dblist(filename):
       if as_datetype.year not in years_in_file:
         years_in_file.append(as_datetype.year)
 
-  return crossing_db, cross_types, sorted(years_in_file)
+      # all_borders. insert only unique border values
+      if border not in all_borders:
+        all_borders.append(border)
+
+  return crossing_db, cross_types, sorted(years_in_file), all_borders
 
 
 def write_header(filename):
@@ -95,93 +101,66 @@ def main():
     sys.exit(1)
 
   # convert input file into list
-  crossing_db, cross_types, years_in_file = csv_to_dblist(sys.argv[1])
+  crossing_db, cross_types, years_in_file, all_borders = csv_to_dblist(sys.argv[1])
   results = []
-  
-  for year in years_in_file:
 
-    # create dictionaries to store crossing type and sums per month
-    # also clean values each iteration of year
-    canada_crossings = {}
-    mexico_crossings = {}
-    accumulate_canada = {}
-    accumulate_mexico = {}
-    for cross_t in cross_types:
-      if cross_t not in canada_crossings:
-        canada_crossings[cross_t] = 0
-      if cross_t not in mexico_crossings:
-        mexico_crossings[cross_t] = 0
-      if cross_t not in accumulate_canada:
-        accumulate_canada[cross_t] = []
-      if cross_t not in accumulate_mexico:
-        accumulate_mexico[cross_t] = []
+  for border in all_borders:
 
-    for month in range(1, 13):
+    for year in years_in_file:
 
-      # clean values each month
+      # create dictionaries to store crossing type and sums per month
+      # also clean values each iteration of year
+      crossings_by_border = {}
+      lists_for_avg_calc = {}
       for cross_t in cross_types:
-        canada_crossings[cross_t] = 0
-        mexico_crossings[cross_t] = 0
-        running_avg = 0
+        if cross_t not in crossings_by_border:
+          crossings_by_border[cross_t] = 0
+        if cross_t not in lists_for_avg_calc:
+          lists_for_avg_calc[cross_t] = []
 
-      # iterate over db. all crossing types for Canada
-      for _, db_row in enumerate(crossing_db):
-        if (db_row.border == 'US-Canada Border') and (db_row.date.year == year) and (db_row.date.month == month):
+      for month in range(1, 13):
 
-          # take the date to use it outside this loop
-          date_to_report = db_row.date
+        # clean values each month
+        for cross_t in cross_types:
+          crossings_by_border[cross_t] = 0
 
-          for cross_t in cross_types:
-            if db_row.measure == cross_t:
-              tmp_sum = canada_crossings[cross_t]
-              tmp_sum += db_row.value
-              canada_crossings[cross_t] = tmp_sum
+        # iterate over db. all crossing types per border
+        for _, db_row in enumerate(crossing_db):
+          if (db_row.border == border) and (db_row.date.year == year) and (db_row.date.month == month):
 
-        # iterate over all crossing types for Mexico
-        if (db_row.border == 'US-Mexico Border') and (db_row.date.year == year) and (db_row.date.month == month):
+            # take the date to use it outside this loop
+            date_to_report = db_row.date
 
-          date_to_report = db_row.date
+            for cross_t in cross_types:
+              if db_row.measure == cross_t:
+                tmp_sum = crossings_by_border[cross_t]
+                tmp_sum += db_row.value
+                crossings_by_border[cross_t] = tmp_sum
 
-          for cross_t in cross_types:
-            if db_row.measure == cross_t:
-              tmp_sum = mexico_crossings[cross_t]
-              tmp_sum += db_row.value
-              mexico_crossings[cross_t] = tmp_sum
+        # we've just accumulated all crossings per type and month
+        # calculate averages and save results into a new list
+        for item, value in crossings_by_border.items():
+          if value > 0:
 
-      # we've just accumulated all crossings per type and month
-      # calculate averages and put results into a list
-      for item, value in canada_crossings.items():
-        if value > 0:
-
-          # accumulate_canada and accumulate_mexico store all the values we observe
-          # for each crossing during the year. 12 values maximum (one per month)
-          # we use avg_list just to simplify the code.
-          accumulate_canada[item].append(value)
-          avg_list = accumulate_canada[item]
+            # lists_for_avg_calc stores all the values we observe for each crossing
+            # during the year. 12 values maximum (one per month)
+            # we use avg_list just to simplify the code
+            lists_for_avg_calc[item].append(value)
+            avg_list = lists_for_avg_calc[item]
           
-          # running average is zero at the beginning of the year, or until avg_list
-          # grows to 2 values. in that case running average is the first value on 
-          # avg_list
-          if len(avg_list) == 2:
-            running_avg = avg_list[0]
+            # running average is zero at the beginning of the year, or until avg_list
+            # grows to 2 values, in which case running avg is first value on avg_list
+            running_avg = 0
 
-          # after avg_list grows bigger than 2, calculate running average as follows
-          # sum all elements on avg_list except the last value (which is our current
-          # value to save on results), and divide by number of elements on avg_list-1
-          if len(avg_list) > 2:
-            running_avg = round_up_trunc((sum(avg_list) - avg_list[-1]) / (len(avg_list) - 1))
-          results.append(['US-Canada Border', date_to_report, item, value, running_avg])
+            if len(avg_list) == 2:
+              running_avg = avg_list[0]
 
-      # exact same process for mexico crossings
-      for item, value in mexico_crossings.items():
-        if value > 0:
-          accumulate_mexico[item].append(value)
-          avg_list = accumulate_mexico[item]
-          if len(avg_list) == 2:
-            running_avg = avg_list[0]
-          if len(avg_list) > 2:
-            running_avg = round_up_trunc((sum(avg_list) - avg_list[-1]) / (len(avg_list) - 1))
-          results.append(['US-Mexico Border', date_to_report, item, value, running_avg])
+            # after avg_list grows bigger than 2, calculate running average as follows
+            # sum all elements on avg_list except the last value (which is our current
+            # value to save), and divide by number of elements on avg_list-1
+            if len(avg_list) > 2:
+              running_avg = round_up_trunc((sum(avg_list) - avg_list[-1]) / (len(avg_list) - 1))
+            results.append([border, date_to_report, item, value, running_avg])
 
   
   # sort results according to requirements using itemgetter()
