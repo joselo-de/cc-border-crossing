@@ -32,7 +32,7 @@ def csv_to_dblist(filename):
      years_in_file. list of all years in csv
      all_borders. list of all borders in file
   """
-  with open(filename, 'r') as f:
+  with open(filename, 'r', encoding='utf_8') as f:
     # skip first line (header)
     first_line = f.readline()
 
@@ -68,7 +68,7 @@ def csv_to_dblist(filename):
 
 def write_header(filename):
   """Create the output file. Add header"""
-  f = open(filename, 'w')
+  f = open(filename, 'w', encoding='utf_8')
   f.write('Border,Date,Measure,Value,Average\n')
   f.close()
   return
@@ -76,7 +76,7 @@ def write_header(filename):
   
 def write_line(filename, line):
   """Open output file in Append mode to write one line at a time"""
-  f = open(filename, 'a')
+  f = open(filename, 'a', encoding='utf_8')
 
   # format and join text with a comma
   format_line = ['{}'.format(i) for i in line]
